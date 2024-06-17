@@ -21,4 +21,16 @@ image path填写你的图片文件夹，要包含txt标注文件
 
 base dir任意填写你要保存的项目文件夹
 
+The original project is here https://github.com/bghira/SimpleTuner
+Currently, the original project does not support Windows, it is best to use WSL or Linux, but it may be supported in the future, so I have also written a part of it, the tests do not pass, those interested can try it themselves.
+The configuration is too cumbersome, so I want to write something for automated configuration, but I don't want to write a frontend, so I have to borrow comfyui.
+Usage: Put the folder into the comfyui's custom_nodes folder.
+1. First, use apt or another package manager in the terminal to install xterm: sudo apt install xterm
+2. Download the env folder, fill in the path where Python is located, for example, /media/xxxxx/env/bin
+Download link: Link: https://pan.baidu.com/s/1-PwTmYo85cL7s94kORJYiQ?pwd=x288 Access code: x288
+3. Fill in the other fields, and it can run automatically.
+For modelname, fill in your sd3 download path, for example, /media/xxxxx/models--stabilityai--stable-diffusion-3-medium-diffusers/snapshots/b1148b4028b9ec56ebd36444c193d56aeff7ab56 or use stabilityai/stable-diffusion-3-medium-diffusers (not recommended).
+For image path, fill in your image folder, which should include a txt annotation file.
+For base dir, fill in any project folder you want to save to.
+
 ![image](https://github.com/pzzmyc/comfyui-sd3-simple-simpletuner/assets/43562427/13df99cf-abc2-4488-91c3-4a3ea688ba47)
