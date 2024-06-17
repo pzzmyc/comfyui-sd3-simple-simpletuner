@@ -12,4 +12,11 @@ sd3 自用懒人训练脚本
 2.下载 env文件夹，将python所在的路径填上，例如/media/xxxxx/env/bin
 
 3.其他的也填上，就可以自动运行了 
+
+modelname 填写你的sd3下载路径，例如/media/xxxxx/models--stabilityai--stable-diffusion-3-medium-diffusers/snapshots/b1148b4028b9ec56ebd36444c193d56aeff7ab56或者使用stabilityai/stable-diffusion-3-medium-diffusers(不推荐)
+
+image path填写你的图片文件夹，要包含txt标注文件
+
+base dir填写你要保存的项目文件夹，随便哪里
+
 ![image](https://github.com/pzzmyc/comfyui-sd3-simple-simpletuner/assets/43562427/13df99cf-abc2-4488-91c3-4a3ea688ba47)
