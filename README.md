@@ -21,6 +21,8 @@ image path填写你的图片文件夹，要包含txt标注文件
 
 base dir任意填写你要保存的项目文件夹
 
+######################################施工线#############################################
+
 The original project is here https://github.com/bghira/SimpleTuner
 Currently, the original project does not support Windows, it is best to use WSL or Linux, but it may be supported in the future, so I have also written a part of it, the tests do not pass, those interested can try it themselves.
 The configuration is too cumbersome, so I want to write something for automated configuration, but I don't want to write a frontend, so I have to borrow comfyui.
