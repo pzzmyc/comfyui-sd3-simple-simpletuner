@@ -1,3 +1,4 @@
+sd3 自用懒人训练脚本
 原项目在这里https://github.com/bghira/SimpleTuner
 
 目前原项目还不支持windows,最好使用wsl或者linux
