@@ -106,17 +106,22 @@ class simpletuner:
                 found = False
                 for i, line in enumerate(lines):
                     if line.startswith(f"export {key}="):
-                        if '"' in line or "'" in line:  # 检查是否使用了引号
+                        # 清除注释
+                        comment_index = line.find('#')
+                        if comment_index != -1:
+                            line = line[:comment_index].strip()
+                        # 更新值
+                        if '"' in line or "'" in line:
                             quote_char = '"' if '"' in line else "'"
                             start_index = line.find(quote_char) + 1
                             end_index = line.rfind(quote_char)
-                            lines[i] = line[:start_index] + str(value) + line[end_index:]
+                            lines[i] = line[:start_index] + str(value) + line[end_index:] + "\n"
                         else:
                             lines[i] = f"export {key}={value}\n"
                         found = True
                         updated_keys.add(key)
                         break
-                if not found:  # If the key is not found, raise an error
+                if not found:
                     raise ValueError(f"Key '{key}' not found in the environment file.")
 
             # Write the updated contents back to the file
@@ -134,7 +139,7 @@ class simpletuner:
     def INPUT_TYPES(s):
         return {"required": { "MODEL_TYPE": (["lora", "full"],),
                               "CHECKPOINTING_STEPS": ("INT", {"default": 1000, "min": 1, "step": 500}),
-                              "LEARNING_RATE": ("FLOAT", {"default": 8e-7, "min": 1e-10, "max": 1.0, "step": 1e-6}),
+                              "LEARNING_RATE": ("STRING", {"default": 0.000001, "multiline": False}),
                               "MODEL_NAME": ("STRING", {"multiline": False}),
                               "BASE_DIR": ("STRING", {"multiline": False}),
                               "IMAGE_PATH": ("STRING", {"multiline": False}),
@@ -144,7 +149,7 @@ class simpletuner:
                               "NUM_EPOCHS": ("INT", {"default": 10, "min": 1, "max": 480000000, "step": 1}),
                               "GRADIENT_ACCUMULATION_STEPS": ("INT", {"default": 4, "min": 1, "max": 480000000, "step": 1}),
                               "LR_SCHEDULE": (["constant", "sine"],),
-                              "LR_WARMUP_STEPS": ("INT", {"default": 1000, "min": 1, "max": 480000000, "step": 1}),
+                              "LR_WARMUP_STEPS": ("INT", {"default": 1000, "min": 0, "max": 480000000, "step": 1}),
                               "TRAINING_NUM_PROCESSES": ("INT", {"default": 1, "min": 1, "max": 480000000, "step": 1}),
                               "run": (["no", "yes"],),
                               
