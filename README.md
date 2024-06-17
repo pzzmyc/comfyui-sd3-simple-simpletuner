@@ -33,7 +33,7 @@ Usage: Put the folder into the comfyui's custom_nodes folder.
 
 2. Download the env folder, fill in the path where Python is located, for example, /media/xxxxx/env/bin
 
-Download link: uploading...
+Download link: https://drive.google.com/file/d/1pbFDgoGmI8-55eX3NcAMhCzG856TfRys/view?usp=sharing
 
 3. Fill in the other fields, and it can run automatically.
 For modelname, fill in your sd3 download path, for example, /media/xxxxx/models--stabilityai--stable-diffusion-3-medium-diffusers/snapshots/b1148b4028b9ec56ebd36444c193d56aeff7ab56 or use stabilityai/stable-diffusion-3-medium-diffusers (not recommended).
