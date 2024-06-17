@@ -27,7 +27,7 @@ The configuration is too cumbersome, so I want to write something for automated 
 Usage: Put the folder into the comfyui's custom_nodes folder.
 1. First, use apt or another package manager in the terminal to install xterm: sudo apt install xterm
 2. Download the env folder, fill in the path where Python is located, for example, /media/xxxxx/env/bin
-Download link: Link: https://pan.baidu.com/s/1-PwTmYo85cL7s94kORJYiQ?pwd=x288 Access code: x288
+Download link: uploading...
 3. Fill in the other fields, and it can run automatically.
 For modelname, fill in your sd3 download path, for example, /media/xxxxx/models--stabilityai--stable-diffusion-3-medium-diffusers/snapshots/b1148b4028b9ec56ebd36444c193d56aeff7ab56 or use stabilityai/stable-diffusion-3-medium-diffusers (not recommended).
 For image path, fill in your image folder, which should include a txt annotation file.
