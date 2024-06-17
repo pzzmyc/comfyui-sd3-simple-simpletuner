@@ -87,7 +87,8 @@ class simpletuner:
             "ACCELERATE_EXTRA_ARGS": accelerate_args,
             "USE_XFORMERS": "false",
             "OUTPUT_DIR": os.path.join(kwargs.get('BASE_DIR', ''), 'savedmodels'), 
-            "PUSH_CHECKPOINTS":"false"
+            "PUSH_CHECKPOINTS":"false",
+            "USE_GRADIENT_CHECKPOINTING": "false"
 
             
         }
