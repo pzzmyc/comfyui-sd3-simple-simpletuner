@@ -1,7 +1,7 @@
 sd3 自用懒人训练脚本
 原项目在这里https://github.com/bghira/SimpleTuner
 
-目前原项目还不支持windows,最好使用wsl或者linux
+目前原项目还不支持windows,最好使用wsl或者linux，但也许未来会支持，所有我也写了一部分，暂时还没完成
 
 配置过于繁琐，所以想写个自动化配置的东西，又不想写前端，只好借用一下comfyui，
 
