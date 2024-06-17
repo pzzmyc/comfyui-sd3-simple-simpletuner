@@ -139,7 +139,7 @@ class simpletuner:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "MODEL_TYPE": (["lora", "full"],),
-                              "CHECKPOINTING_STEPS": ("INT", {"default": 1000, "min": 1, "step": 500}),
+                              "CHECKPOINTING_STEPS": ("INT", {"default": 1000, "min": 0, "step": 10}),
                               "LEARNING_RATE": ("STRING", {"default": 0.000001, "multiline": False}),
                               "MODEL_NAME": ("STRING", {"multiline": False}),
                               "BASE_DIR": ("STRING", {"multiline": False}),
