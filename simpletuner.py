@@ -46,7 +46,8 @@ class simpletuner:
 
         return "dataset.json updated successfully."
 
-    def update_sdxl_env(self, BASE_DIR,**kwargs):
+    def update_sdxl_env(self, BASE_DIR, **kwargs):
+        print("BASE_DIR:", BASE_DIR) 
         env_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "SimpleTuner", "sdxl-env.sh")
         env_example_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "SimpleTuner", "sdxl-env.sh.example")
         dataset_json_path = os.path.join(BASE_DIR, "dataset.json")
@@ -74,19 +75,20 @@ class simpletuner:
 
         # Update DATALOADER_CONFIG to point to dataset.json
         kwargs['DATALOADER_CONFIG'] = dataset_json_path
+        kwargs['OUTPUT_DIR'] = os.path.join(BASE_DIR, 'savedmodels')
+        print("OUTPUT_DIR:", kwargs['OUTPUT_DIR'])
 
         # Determine the value for ACCELERATE_EXTRA_ARGS based on TRAINING_NUM_PROCESSES
         accelerate_args = "--multi_gpu" if kwargs.get('TRAINING_NUM_PROCESSES', 1) > 1 else ""
 
         # Fixed values that need to be updated in the file
         fixed_values = {
-            "STABLE_DIFFUSION_3": "true",
             "MAX_NUM_STEPS": "0",
             "RESOLUTION_TYPE": "pixel",
             "VALIDATION_STEPS": "10000000000000000000",
             "ACCELERATE_EXTRA_ARGS": accelerate_args,
             "USE_XFORMERS": "false",
-            "OUTPUT_DIR": os.path.join(kwargs.get('BASE_DIR', ''), 'savedmodels'), 
+            "OUTPUT_DIR": kwargs['OUTPUT_DIR'],
             "PUSH_CHECKPOINTS":"false",
             "USE_GRADIENT_CHECKPOINTING": "false"
 
@@ -125,6 +127,9 @@ class simpletuner:
                 if not found:
                     raise ValueError(f"Key '{key}' not found in the environment file.")
 
+            # Ensure each line has only one newline character
+            lines = [line.strip() + '\n' for line in lines]
+
             # Write the updated contents back to the file
             with open(env_file_path, 'w') as file:
                 file.writelines(lines)
@@ -139,6 +144,7 @@ class simpletuner:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "MODEL_TYPE": (["lora", "full"],),
+                              "STABLE_DIFFUSION_3": (["true", "false"],),
                               "CHECKPOINTING_STEPS": ("INT", {"default": 1000, "min": 0, "step": 10}),
                               "LEARNING_RATE": ("STRING", {"default": 0.000001, "multiline": False}),
                               "MODEL_NAME": ("STRING", {"multiline": False}),
