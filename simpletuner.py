@@ -1,8 +1,16 @@
-
 import os
+import sys
 import subprocess
 import platform
 
+# Automatically set the current working directory to the script's directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
+# Add the script's directory to the system path
+sys.path.append(script_dir)
+
+from sdxl_model_util import finalsave
 
 class simpletuner:
 
@@ -78,29 +86,39 @@ class simpletuner:
         kwargs['OUTPUT_DIR'] = os.path.join(BASE_DIR, 'savedmodels')
         print("OUTPUT_DIR:", kwargs['OUTPUT_DIR'])
 
-        # Determine the value for ACCELERATE_EXTRA_ARGS based on TRAINING_NUM_PROCESSES
         accelerate_args = "--multi_gpu" if kwargs.get('TRAINING_NUM_PROCESSES', 1) > 1 else ""
-
-        # Fixed values that need to be updated in the file
+        
+        # Append additional arguments to existing trainer_extra_args if provided
+        trainer_extra_args = kwargs.get('TRAINER_EXTRA_ARGS', "")
+        if kwargs.get('TRAIN_TEXT_ENCODER', 'false') == 'true':
+            trainer_extra_args += " --train_text_encoder"
+        if 'LORA_RANK' in kwargs and kwargs.get('MODEL_TYPE') != 'full':
+            trainer_extra_args += f" --lora_rank {kwargs['LORA_RANK']}"
+        if 'TEXT_ENCODER_LR' in kwargs:
+            trainer_extra_args += f" --text_encoder_lr {kwargs['TEXT_ENCODER_LR']}"
+        trainer_extra_args = trainer_extra_args.strip()
+        kwargs['BASE_DIR'] = BASE_DIR
         fixed_values = {
             "MAX_NUM_STEPS": "0",
             "RESOLUTION_TYPE": "pixel",
             "VALIDATION_STEPS": "10000000000000000000",
             "ACCELERATE_EXTRA_ARGS": accelerate_args,
-            "USE_XFORMERS": "false",
             "OUTPUT_DIR": kwargs['OUTPUT_DIR'],
-            "PUSH_CHECKPOINTS":"false",
-            "USE_GRADIENT_CHECKPOINTING": "false"
-
-            
+            "PUSH_CHECKPOINTS": "false",
+            "TRAINER_EXTRA_ARGS": trainer_extra_args
         }
 
         # Merge fixed values with kwargs
         kwargs.update(fixed_values)
 
-        # Remove IMAGE_PATH from kwargs if present
+        # Remove 
         kwargs.pop('IMAGE_PATH', None)
         kwargs.pop('PYTHON_PATH', None)
+        kwargs.pop('LORA_RANK', None)
+        kwargs.pop('TRAIN_TEXT_ENCODER', None)
+        kwargs.pop('just_click_it_before_run', None)
+        kwargs.pop('TEXT_ENCODER_LR', None)
+
 
         try:
             # Update the lines based on the provided kwargs
@@ -140,24 +158,33 @@ class simpletuner:
 
 
 
-
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "MODEL_TYPE": (["lora", "full"],),
-                              "STABLE_DIFFUSION_3": (["true", "false"],),
+                              "STABLE_DIFFUSION_3": (["true", "false"],{"default": "false"}),
                               "CHECKPOINTING_STEPS": ("INT", {"default": 1000, "min": 0, "step": 10}),
-                              "LEARNING_RATE": ("STRING", {"default": 0.000001, "multiline": False}),
-                              "MODEL_NAME": ("STRING", {"multiline": False}),
-                              "BASE_DIR": ("STRING", {"multiline": False}),
-                              "IMAGE_PATH": ("STRING", {"multiline": False}),
-                              "PYTHON_PATH": ("STRING", {"multiline": False}),
-                              "RESOLUTION": ("INT", {"default": 1024, "min": 0, "max": 480000000, "step":1}),
-                              "TRAIN_BATCH_SIZE": ("INT", {"default": 1, "min": 1, "max": 480000000, "step": 1}),
-                              "NUM_EPOCHS": ("INT", {"default": 10, "min": 1, "max": 480000000, "step": 1}),
-                              "GRADIENT_ACCUMULATION_STEPS": ("INT", {"default": 4, "min": 1, "max": 480000000, "step": 1}),
-                              "LR_SCHEDULE": (["constant", "sine"],),
-                              "LR_WARMUP_STEPS": ("INT", {"default": 1000, "min": 0, "max": 480000000, "step": 1}),
-                              "TRAINING_NUM_PROCESSES": ("INT", {"default": 1, "min": 1, "max": 480000000, "step": 1}),
+                              "LEARNING_RATE": ("FLOAT", {"default": 0.000001, "step": 0.000001}),
+                              "TEXT_ENCODER_LR": ("FLOAT", {"default": 0.00001,"step": 0.000001}),
+                              "MODEL_NAME": ("STRING", {"multiline": True}),
+                              "BASE_DIR": ("STRING", {"multiline": True}),
+                              "IMAGE_PATH": ("STRING", {"multiline": True}),
+                              "PYTHON_PATH": ("STRING", {"multiline": True}),
+                              "USE_XFORMERS": (["true", "false"],),
+                              "LORA_RANK": ("INT", {"default": 16, "min": 0, "step": 1}),
+                              "TRAIN_TEXT_ENCODER": (["false", "true"],),
+                              "RESOLUTION": ("INT", {"default": 1024, "min": 0, "step":1}),
+                              "TRAIN_BATCH_SIZE": ("INT", {"default": 1, "min": 1, "step": 1}),
+                              "NUM_EPOCHS": ("INT", {"default": 10, "min": 1, "step": 1}),
+                              "USE_GRADIENT_CHECKPOINTING": (["true", "false"],),
+                              "GRADIENT_ACCUMULATION_STEPS": ("INT", {"default": 4, "min": 1, "step": 1}),
+                              "OPTIMIZER": (["adamw_bf16", "adamw", "adamw8bit", "adafactor", "dadaptation"], {"default": "adamw_bf16"}),
+                              "MIXED_PRECISION": (["no", "bf16"], {"default": "bf16"}),
+                              "PURE_BF16": (["true", "false"], {"default": "true"}),
+                              "LR_SCHEDULE": (["linear", "sine", "cosine", "cosine_with_restarts", "polynomial", "constant"], {"default": "constant"}),
+                              "LR_WARMUP_STEPS": ("INT", {"default": 1000, "min": 0, "step": 1}),
+                              "TRAINING_NUM_PROCESSES": ("INT", {"default": 1, "min": 1, "step": 1}),
+                              "TRAINER_EXTRA_ARGS": ("STRING", {"multiline": True}),
+                              "just_click_it_before_run": ("INT", {"default": 0, "min": 0, "max": 0xffffffffff}),
                               "run": (["no", "yes"],),
                               
                              }}
@@ -180,6 +207,15 @@ class simpletuner:
                     output_log += "\nErrors:\n" + process.stderr
             else:
                 output_log += "Repository already exists at " + repo_dir + "\n"
+
+        # Check if MODEL_NAME ends with .safetensor and convert if necessary
+        if kwargs['MODEL_NAME'].endswith('.safetensors'):
+            input_ckpt_path = kwargs['MODEL_NAME']
+            model_output_dir = os.path.join(kwargs['BASE_DIR'], 'savedmodels')
+            output_log += "Model conversion in progress...\n"
+            finalsave(input_ckpt_path, model_output_dir)
+            output_log += "Model converted\n"
+            kwargs['MODEL_NAME'] = model_output_dir
 
         # 调用 update_sdxl_env 方法并收集日志
         update_env_result = self.update_sdxl_env(**kwargs)
@@ -226,8 +262,8 @@ class simpletuner:
 
 
 NODE_CLASS_MAPPINGS = {
-    "sd3 simple simpletuner by hhy": simpletuner
+    "sd not very simple simpletuner by hhy": simpletuner
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "simpletuner": "simpletuner"
+    "simpletunerpro": "simpletuner_pro"
 }
